@@ -4,11 +4,33 @@ import { motion } from "framer-motion";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
 import { fetchCart } from "../utils/fetchLocalStorageData";
+import { getDatabase, ref, set,update } from "firebase/database";
+import userEvent from "@testing-library/user-event";
+
+// function writeUserData(userId, name, email, imageUrl) {
+//   const db = getDatabase();
+//   set(ref(db, 'users/' + userId), {
+//     username: name,
+//     email: email,
+//     profile_picture : imageUrl
+//   });
+// }
+
 let items = [];
 
 const CartItem = ({ item, setFlag, flag }) => {
-  const [{ cartItems }, dispatch] = useStateValue();
+  const [{ user,cartItems }, dispatch] = useStateValue();
   const [qty, setQty] = useState(item.qty);
+  const db = getDatabase();
+
+  // useEffect(() => {
+  //   const db = getDatabase();
+  //   update(ref(db, 'items/'), {
+  //     item :
+  //   });
+    
+  // }, [items])
+  
 
   const cartDispatch = () => {
     localStorage.setItem("cartItems", JSON.stringify(items));
@@ -25,6 +47,14 @@ const CartItem = ({ item, setFlag, flag }) => {
         if (item.id === id) {
           item.qty += 1;
           setFlag(flag + 1);
+          set(ref(db, 'items/' + user.uid), {
+            item : cartItems
+          });
+          // update(ref(db,"items/"+user.uid), 
+          // {
+          //   item:items.qty++
+          // }
+          // );
         }
       });
       cartDispatch();
@@ -34,12 +64,18 @@ const CartItem = ({ item, setFlag, flag }) => {
         items = cartItems.filter((item) => item.id !== id);
         setFlag(flag + 1);
         cartDispatch();
+        set(ref(db, 'items/' + user.uid), {
+          item : JSON.parse(localStorage.getItem("cartItems"))
+        });
       } else {
         setQty(qty - 1);
         cartItems.map((item) => {
           if (item.id === id) {
             item.qty -= 1;
             setFlag(flag + 1);
+            set(ref(db, 'items/' + user.uid), {
+              item : cartItems
+            });
           }
         });
         cartDispatch();

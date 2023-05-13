@@ -4,27 +4,48 @@ import { motion } from "framer-motion";
 import NotFound from "../img/NotFound.svg";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
+import { getDatabase, ref, set } from "firebase/database";
 
 const RowContainer = ({ flag, data, scrollValue }) => {
   const rowContainer = useRef();
+  // const [{ user, cartShow, cartItems }, dispatch] = useStateValue();
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(
+    () => {
+      return JSON.parse(localStorage.getItem("cartItems")) || []
+    }
+  );
+  const db = getDatabase();
+  const [{ user,cartItems }, dispatch] = useStateValue();
 
-  const [{ cartItems }, dispatch] = useStateValue();
+  // useEffect(() => {
+  //   const data = localStorage.getItem("cartItems")
+  //   console.log(data);
+  //   if(data!==null) setItems(JSON.parse(data))
+  // }, [])
 
   const addtocart = () => {
-    dispatch({
-      type: actionType.SET_CARTITEMS,
-      cartItems: items,
+    
+    
+    if(user!==null){
+      dispatch({
+        type: actionType.SET_CARTITEMS,
+        cartItems: items,
+      });
+      set(ref(db, 'items/' + user.uid), {
+      item : items
     });
+    console.log(items);
     localStorage.setItem("cartItems", JSON.stringify(items));
+  }
   };
+  
 
   useEffect(() => {
     rowContainer.current.scrollLeft += scrollValue;
   }, [scrollValue]);
 
-  useEffect(() => {
+  useEffect(() => { 
     addtocart();
   }, [items]);
 
@@ -56,7 +77,7 @@ const RowContainer = ({ flag, data, scrollValue }) => {
               </motion.div>
               <motion.div
                 whileTap={{ scale: 0.75 }}
-                className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center cursor-pointer hover:shadow-md -mt-8"
+                className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center cursor-pointer hover:shadow-md -mt-8"
                 onClick={() => setItems([...cartItems, item])}
               >
                 <MdShoppingBasket className="text-white" />

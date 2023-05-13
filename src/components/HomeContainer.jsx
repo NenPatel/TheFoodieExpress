@@ -1,17 +1,28 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Delivery from "../img/delivery.png";
 import HeroBg from "../img/heroBg.png";
 import { heroData } from "../utils/data";
+import 'animate.css';
+import { useSpring, animated } from '@react-spring/web'
+
 
 const HomeContainer = () => {
+  const props = useSpring({
+    from: { opacity: 0,color:"black" },
+    to: { opacity: 1,color:'red' },
+    // delay:1000
+  })
+
+  const navigate = useNavigate();
   return (
     <section
       className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full "
       id="home"
     >
       <div className="py-2 flex-1 flex flex-col items-start justify-center gap-6">
-        <div className="flex items-center gap-2 justify-center bg-orange-100 px-4 py-1 rounded-full">
-          <p className="text-base text-orange-500 font-semibold">
+        <div className="flex items-center gap-2 justify-center bg-red-100 px-4 py-1 rounded-full">
+          <p className="text-base text-blue-600 font-semibold">
             Bike Delivery
           </p>
           <div className="w-8 h-8 bg-white rounded-full overflow-hidden drop-shadow-xl">
@@ -23,9 +34,9 @@ const HomeContainer = () => {
           </div>
         </div>
 
-        <p className="text-[2.5rem] lg:text-[4.5rem] font-bold tracking-wide text-headingColor">
+        <p className="animate__slideInLeft text-[2.5rem] lg:text-[4.5rem] font-bold tracking-wide text-headingColor">
           The Fastest Delivery in
-          <span className="text-orange-600 text-[3rem] lg:text-[5rem]">
+          <span className="text-blue-600 text-[3rem] lg:text-[5rem]">
             Your City
           </span>
         </p>
@@ -37,17 +48,17 @@ const HomeContainer = () => {
           suscipit!
         </p>
 
-        <button
-          type="button"
-          className="bg-gradient-to-br from-orange-400 to-orange-500 w-full md:w-auto px-4 py-2  rounded-lg hover:shadow-lg transition-all ease-in-out duration-100"
+        <animated.button
+          type="button" onClick={() => window.scrollTo(0,1100)} style={props}
+          className="bg-gradient-to-br from-blue-600 to-purple-400 w-full md:w-auto px-4 py-2  rounded-lg hover:shadow-2xl hover:bg-red-500 transition-all ease-in-out duration-100"
         >
           Order Now
-        </button>
+        </animated.button>
       </div>
       <div className="py-2 flex-1 flex items-center relative">
         <img
           src={HeroBg}
-          className=" ml-auto h-420 w-full lg:w-auto lg:h-650"
+          className=" ml-auto h-420 w-full lg:w-auto lg:h-650 border-blue-500 rounded-3xl bg-blue-400 shadow-2xl"
           alt="hero-bg"
         />
 
@@ -60,7 +71,7 @@ const HomeContainer = () => {
               >
                 <img
                   src={n.imageSrc}
-                  className="w-20 lg:w-40 -mt-10 lg:-mt-20 "
+                  className="w-20 lg:w-40 -mt-10 lg:-mt-5 "
                   alt="I1"
                 />
                 <p className="text-base lg:text-xl font-semibold text-textColor mt-2 lg:mt-4">

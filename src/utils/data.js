@@ -18,20 +18,20 @@ export const heroData = [
     price: "10.25",
     imageSrc: F1,
   },
-  {
-    id: 3,
-    name: "Chicken Kebab",
-    decp: "Mixed Kebab Plate",
-    price: "8.25",
-    imageSrc: C3,
-  },
-  {
-    id: 4,
-    name: "Fish Kebab",
-    decp: "Mixed Fish Kebab",
-    price: "5.25",
-    imageSrc: Fi1,
-  },
+  // {
+  //   id: 3,
+  //   name: "Chicken Kebab",
+  //   decp: "Mixed Kebab Plate",
+  //   price: "8.25",
+  //   imageSrc: C3,
+  // },
+  // {
+  //   id: 4,
+  //   name: "Fish Kebab",
+  //   decp: "Mixed Fish Kebab",
+  //   price: "5.25",
+  //   imageSrc: Fi1,
+  // },
 ];
 
 export const categories = [

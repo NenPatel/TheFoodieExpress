@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
-
+import { getDatabase, ref, set } from "firebase/database";
 import { motion } from "framer-motion";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
 import EmptyCart from "../img/emptyCart.svg";
 import CartItem from "./CartItem";
+import { useNavigate } from "react-router-dom";
 
 const CartContainer = () => {
   const [{ cartShow, cartItems, user }, dispatch] = useStateValue();
   const [flag, setFlag] = useState(1);
   const [tot, setTot] = useState(0);
-
+  const db = getDatabase();
+  const navigate = useNavigate();
   const showCart = () => {
     dispatch({
       type: actionType.SET_CART_SHOW,
@@ -28,12 +30,15 @@ const CartContainer = () => {
     console.log(tot);
   }, [tot, flag]);
 
-  const clearCart = () => {
+  const clearCart = () => {   // use condition if user!==null
     dispatch({
       type: actionType.SET_CARTITEMS,
       cartItems: [],
     });
-
+    
+    set(ref(db, 'items/' + user.uid), {
+      item : null
+    });
     localStorage.setItem("cartItems", JSON.stringify([]));
   };
 
@@ -102,6 +107,7 @@ const CartContainer = () => {
                 whileTap={{ scale: 0.8 }}
                 type="button"
                 className="w-full p-2 rounded-full bg-gradient-to-tr from-orange-400 to-orange-600 text-gray-50 text-lg my-2 hover:shadow-lg"
+                onClick={() => navigate("/checkout")}
               >
                 Check Out
               </motion.button>
@@ -110,8 +116,9 @@ const CartContainer = () => {
                 whileTap={{ scale: 0.8 }}
                 type="button"
                 className="w-full p-2 rounded-full bg-gradient-to-tr from-orange-400 to-orange-600 text-gray-50 text-lg my-2 hover:shadow-lg"
+                onClick={() => alert("LogIn to Check out")}
               >
-                Login to check out
+                Make Payment
               </motion.button>
             )}
           </div>
@@ -129,3 +136,4 @@ const CartContainer = () => {
 };
 
 export default CartContainer;
+// export {tot}

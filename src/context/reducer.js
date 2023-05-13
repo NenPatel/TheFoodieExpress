@@ -1,3 +1,5 @@
+import { initialState } from "./initalState";
+
 export const actionType = {
   SET_USER: "SET_USER",
   SET_FOOD_ITEMS: "SET_FOOD_ITEMS",

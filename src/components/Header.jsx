@@ -1,23 +1,75 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdShoppingBasket, MdAdd, MdLogout } from "react-icons/md";
 import { motion } from "framer-motion";
-
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { app } from "../firebase.config";
-
-import Logo from "../img/logo.png";
+import Logo from "../img/images-bg.png";
 import Avatar from "../img/avatar.png";
+import Guest from "../img/images2.png";
 import { Link } from "react-router-dom";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
+import { getDatabase, ref, onValue} from "firebase/database";
+// import { getAuth } from "firebase/auth";
 
 const Header = () => {
+  const db = getDatabase();
+  // const auth = getAuth()
+  
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
-
   const [{ user, cartShow, cartItems }, dispatch] = useStateValue();
+  // let data = [];
+  const initialCall = () => {
+    if(user!==null){
+      // const userId = auth.currentUser.uid;
+      const starCountRef11 = ref(db, 'items/' + user.uid+"/item");
+      onValue(starCountRef11, (snapshot) => {
+        console.log(snapshot.val());
+        console.log("intital");
+        localStorage.setItem("cartItems",JSON.stringify(snapshot.val()))
+      return snapshot.val()?snapshot.val(): [];
 
+      // console.log("hello2");
+      // updateStarCount(postElement, data);
+      // console.log(data.length);
+    });
+    }
+  }
+  const [data,setData] = useState(initialCall)
+  
+  // console.log(user);
+  // console.log(data);
   const [isMenu, setIsMenu] = useState(false);
+
+  useEffect(() => {
+    if(user!==null){
+    
+    // const starCountRef11 = ref(db, 'items/' + user.uid+"/item");
+    //   onValue(starCountRef11, (snapshot) => {
+    //   setData(snapshot.val());
+    //   console.log("Done");
+    // })
+    localStorage.setItem("cartItems",JSON.stringify(data))
+  }
+    }, [user])
+  
+
+  useEffect(() => {
+    if(user!==null){
+      const starCountRef = ref(db, 'items/' + user.uid+"/item");
+      onValue(starCountRef, (snapshot) => {
+      const data1 = snapshot.val();
+      setData(data1)
+      console.log("hello");
+      // updateStarCount(postElement, data);
+      // console.log(data.length);
+    });
+    }
+  },[cartItems])
+  
+console.log(data);
+
 
   const login = async () => {
     if (!user) {
@@ -37,6 +89,7 @@ const Header = () => {
   const logout = () => {
     setIsMenu(false);
     localStorage.clear();
+    getAuth().signOut()
 
     dispatch({
       type: actionType.SET_USER,
@@ -52,12 +105,12 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed z-50 w-screen p-3 px-4 md:p-6 md:px-16 bg-primary">
+    <header className="fixed z-50 w-screen p-2 px-4 md:p-2 md:px-12 bg-blue-300">
       {/* desktop & tablet */}
       <div className="hidden md:flex w-full h-full items-center justify-between">
         <Link to={"/"} className="flex items-center gap-2">
-          <img src={Logo} className="w-8 object-cover" alt="logo" />
-          <p className="text-headingColor text-xl font-bold"> City</p>
+          <img src={Logo} className="w-14 object-cover" alt="logo" />
+          <p className="text-xl underline font-bold text-red-600 decoration-slice">The Foodie Express</p>
         </Link>
 
         <div className="flex items-center gap-8">
@@ -65,20 +118,24 @@ const Header = () => {
             initial={{ opacity: 0, x: 200 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 200 }}
-            className="flex items-center gap-24 "
-          >
-            <li className="text-lg text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer">
+            className="flex items-center gap-12 ">
+
+            <Link to={"/"} ><li className="text-xl text-black hover:text-red-600 duration-100 transition-all ease-in-out cursor-pointer">
               Home
-            </li>
-            <li className="text-lg text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer">
+            </li></Link>
+            {/* <Link to={"/menu"} ><li className="text-xl text-black hover:text-red-600 duration-100 transition-all ease-in-out cursor-pointer">
               Menu
-            </li>
-            <li className="text-lg text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer">
-              About Us
-            </li>
-            <li className="text-lg text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer">
+            </li></Link> */}
+            <Link to={"/aboutus"} ><li className="text-xl text-black hover:text-red-600 duration-100 transition-all ease-in-out cursor-pointer">
+              About
+            </li></Link>
+            <Link to={"/contact"} ><li className="text-xl text-black hover:text-red-600 duration-100 transition-all ease-in-out cursor-pointer">
+              Contact
+            </li></Link>
+            <Link to={"/service"} ><li className="text-xl text-black hover:text-red-600 duration-100 transition-all ease-in-out cursor-pointer">
               Service
-            </li>
+            </li></Link>
+
           </motion.ul>
 
           <div
@@ -86,10 +143,10 @@ const Header = () => {
             onClick={showCart}
           >
             <MdShoppingBasket className="text-textColor text-2xl  cursor-pointer" />
-            {cartItems && cartItems.length > 0 && (
+            {data && user && data.length > 0 && (
               <div className=" absolute -top-2 -right-2 w-5 h-5 rounded-full bg-cartNumBg flex items-center justify-center">
                 <p className="text-xs text-white font-semibold">
-                  {cartItems.length}
+                  {data.length}
                 </p>
               </div>
             )}
@@ -99,6 +156,7 @@ const Header = () => {
             <motion.img
               whileTap={{ scale: 0.6 }}
               src={user ? user.photoURL : Avatar}
+              // src={user ? Avatar :  Guest }
               className="w-10 min-w-[40px] h-10 min-h-[40px] drop-shadow-xl cursor-pointer rounded-full"
               alt="userprofile"
               onClick={login}
@@ -110,7 +168,7 @@ const Header = () => {
                 exit={{ opacity: 0, scale: 0.6 }}
                 className="w-40 bg-gray-50 shadow-xl rounded-lg flex flex-col absolute top-12 right-0"
               >
-                {user && user.email === "vetrivel.galaxy@gmail.com" && (
+                {user && user.email === "nenspatel2001@gmail.com" && (
                   <Link to={"/createItem"}>
                     <p
                       className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all duration-100 ease-in-out text-textColor text-base"
@@ -169,7 +227,7 @@ const Header = () => {
               exit={{ opacity: 0, scale: 0.6 }}
               className="w-40 bg-gray-50 shadow-xl rounded-lg flex flex-col absolute top-12 right-0"
             >
-              {user && user.email === "vetrivel.galaxy@gmail.com" && (
+              {user && user.email === "nenspatel2001@gmail.com" && (
                 <Link to={"/createItem"}>
                   <p className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-all duration-100 ease-in-out text-textColor text-base">
                     New Item <MdAdd />
@@ -178,30 +236,31 @@ const Header = () => {
               )}
 
               <ul className="flex flex-col ">
-                <li
+                <Link to="/" ><li
                   className="text-base text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer hover:bg-slate-100 px-4 py-2"
                   onClick={() => setIsMenu(false)}
                 >
                   Home
-                </li>
-                <li
+                </li></Link>
+                <Link to="/contact"><li
                   className="text-base text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer hover:bg-slate-100 px-4 py-2"
                   onClick={() => setIsMenu(false)}
                 >
-                  Menu
-                </li>
-                <li
+                  Contact
+                </li></Link>
+
+                <Link to="/aboutus"><li
                   className="text-base text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer hover:bg-slate-100 px-4 py-2"
                   onClick={() => setIsMenu(false)}
                 >
                   About Us
-                </li>
-                <li
+                </li></Link>
+                <Link to="/service"><li
                   className="text-base text-textColor hover:text-headingColor duration-100 transition-all ease-in-out cursor-pointer hover:bg-slate-100 px-4 py-2"
                   onClick={() => setIsMenu(false)}
                 >
                   Service
-                </li>
+                </li></Link>
               </ul>
 
               <p
