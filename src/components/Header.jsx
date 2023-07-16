@@ -27,6 +27,7 @@ const Header = () => {
       onValue(starCountRef11, (snapshot) => {
         console.log(snapshot.val());
         console.log("intital");
+        console.log(user.uid);
         localStorage.setItem("cartItems",JSON.stringify(snapshot.val()))
       return snapshot.val()?snapshot.val(): [];
 
